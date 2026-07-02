@@ -209,7 +209,7 @@ def generate_heatmap_data(schools_data):
 
 def generate_trend_data(school_data):
     """Generate data Tren Mutu (Multi-Tahun Mock)"""
-    months = pd.date_range(start='2024-01-01', end='2025-01-01', freq='M')
+    months = pd.date_range(start='2024-01-01', end='2025-01-01', freq='ME')  # Changed from 'M' to 'ME'
     trend_data = []
     
     base_score = school_data['rata_rata']
