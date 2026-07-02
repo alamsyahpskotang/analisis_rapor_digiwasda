@@ -194,8 +194,8 @@ def generate_comprehensive_word_report(schools_data):
             f"{avg_mutu_overall:.2f}/100",
             f"{tier1_count} sekolah",
             f"{tier2_count} sekolah",
-            f"{max(schools_data.values(), key=lambda x: x['rata_rata'])['nama']}: {max(d['rata_rata'] for d in schools_data.values()):.2f}",
-            f"{min(schools_data.values(), key=lambda x: x['rata_rata'])['nama']}: {min(d['rata_rata'] for d in schools_data.values()):.2f}"
+            f"{max(schools_data.values(), key=lambda x: x['rata_rata'])['name']}: {max(d['rata_rata'] for d in schools_data.values()):.2f}",
+            f"{min(schools_data.values(), key=lambda x: x['rata_rata'])['name']}: {min(d['rata_rata'] for d in schools_data.values()):.2f}"
         ]
     }
     
