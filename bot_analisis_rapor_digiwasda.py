@@ -485,7 +485,7 @@ with tabs[1]:
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📄 Generate WORD Report", use_container_width=True):
+            if st.button("📄 Generate WORD Report", use_container_width=True, key="comp_word"):
                 with st.spinner("⏳ Generating comprehensive Word report..."):
                     doc = generate_comprehensive_word_report(schools_data)
                     
@@ -499,12 +499,13 @@ with tabs[1]:
                         data=doc_bytes.getvalue(),
                         file_name=f"LAPORAN_KOMPREHENSIF_SEMUA_SEKOLAH_{datetime.now().strftime('%Y%m%d')}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        use_container_width=True
+                        use_container_width=True,
+                        key="comp_word_download"
                     )
                     st.success("✅ Word report generated!")
         
         with col2:
-            if st.button("📋 Generate EXCEL Report", use_container_width=True):
+            if st.button("📋 Generate EXCEL Report", use_container_width=True, key="comp_excel"):
                 with st.spinner("⏳ Generating Excel..."):
                     wb = openpyxl.Workbook()
                     wb.remove(wb.active)
@@ -533,7 +534,8 @@ with tabs[1]:
                         data=wb_bytes.getvalue(),
                         file_name=f"LAPORAN_KOMPREHENSIF_{datetime.now().strftime('%Y%m%d')}.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        use_container_width=True
+                        use_container_width=True,
+                        key="comp_excel_download"
                     )
                     st.success("✅ Excel report generated!")
     else:
@@ -557,7 +559,7 @@ with tabs[2]:
             col1, col2 = st.columns(2)
             
             with col1:
-                if st.button("📄 Generate WORD Report", use_container_width=True):
+                if st.button("📄 Generate WORD Report", use_container_width=True, key="school_word"):
                     with st.spinner("⏳ Generating Word report..."):
                         doc = generate_school_word_report(selected_school, school)
                         
@@ -570,12 +572,13 @@ with tabs[2]:
                             data=doc_bytes.getvalue(),
                             file_name=f"LAPORAN_{selected_school}_{datetime.now().strftime('%Y%m%d')}.docx",
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                            use_container_width=True
+                            use_container_width=True,
+                            key="school_word_download"
                         )
                         st.success("✅ Report generated!")
             
             with col2:
-                if st.button("📋 Generate EXCEL Report", use_container_width=True):
+                if st.button("📋 Generate EXCEL Report", use_container_width=True, key="school_excel"):
                     with st.spinner("⏳ Generating Excel..."):
                         wb = openpyxl.Workbook()
                         ws = wb.active
@@ -601,7 +604,8 @@ with tabs[2]:
                             data=wb_bytes.getvalue(),
                             file_name=f"LAPORAN_{selected_school}_{datetime.now().strftime('%Y%m%d')}.xlsx",
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            use_container_width=True
+                            use_container_width=True,
+                            key="school_excel_download"
                         )
                         st.success("✅ Report generated!")
     else:
