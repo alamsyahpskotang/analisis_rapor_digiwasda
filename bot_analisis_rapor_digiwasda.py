@@ -1,23 +1,18 @@
 """
 BOT ANALISIS RAPOR PENDIDIKAN - METODE DIGIWASDA
 Sistem otomatis untuk analisis Rapor Pendidikan PBD dengan metodologi DIGIWASDA
-DIGIWASDA = Sistem Digital untuk Pengawas Sekolah Berdampak
 
 Usage:
     streamlit run bot_analisis_rapor_digiwasda.py
 
 Requirements:
-    pip install streamlit openpyxl pandas docx reportlab
+    pip install streamlit openpyxl pandas python-docx
 """
 
 import streamlit as st
 import pandas as pd
 import openpyxl
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from datetime import datetime
-import io
-import re
 
 # ===== PAGE CONFIG =====
 st.set_page_config(
@@ -27,22 +22,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ===== STYLING =====
-st.markdown("""
-    <style>
-    .main {
-        padding: 20px;
-    }
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 # ===== HEADER =====
 st.title("🤖 BOT ANALISIS RAPOR PENDIDIKAN")
-st.subtitle("Metode DIGIWASDA - Sistem Digital untuk Pengawas Sekolah Berdampak")
+st.markdown("### Metode DIGIWASDA - Sistem Digital untuk Pengawas Sekolah Berdampak")
 st.markdown("---")
 
 # ===== SIDEBAR =====
@@ -206,9 +188,10 @@ with tab2:
             st.metric("Sekolah Terbaik", f"{best_school[1]['rata_rata']:.2f}")
         
         # Download ranking
+        csv = df_ranking.to_csv(index=False)
         st.download_button(
-            label="📥 Download Ranking (Excel)",
-            data=df_ranking.to_csv(index=False).encode('utf-8'),
+            label="📥 Download Ranking (CSV)",
+            data=csv,
             file_name="RANKING_SEKOLAH_DIGIWASDA.csv",
             mime="text/csv"
         )
@@ -253,7 +236,7 @@ with tab3:
                 
                 ind_data.append({
                     'Indikator': ind_name,
-                    'Skor': skor,
+                    'Skor': f"{skor:.2f}",
                     'Status': status_ind,
                     'Peringkat Kab': ind_data_dict['peringkat_kab'],
                     'Peringkat Nasional': ind_data_dict['peringkat_nasional']
@@ -306,13 +289,6 @@ with tab4:
             
             total_budget = tier1_budget + tier2_budget
             st.metric("Total Budget", f"Rp {total_budget:,}")
-            
-            st.download_button(
-                label="📥 Download RKT & RKAS (Excel)",
-                data=b"RKT & RKAS Excel File",
-                file_name="RKT_RKAS_SEMUA_SEKOLAH_DIGIWASDA.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
     else:
         st.warning("⚠️ Silakan upload file terlebih dahulu")
 
@@ -332,38 +308,7 @@ with tab5:
         - ✅ Action Plan Operasional DIGIWASDA
         """)
         
-        laporan_type = st.radio(
-            "Pilih Format Laporan",
-            ["📄 Word (.docx)", "📊 Excel Comprehensive", "📋 PDF Report"]
-        )
-        
-        if st.button("📝 Generate Laporan Final"):
-            with st.spinner("⏳ Menggenerate laporan DIGIWASDA (ini mungkin memerlukan waktu 30 detik)..."):
-                st.success("✅ Laporan berhasil digenerate dengan metodologi DIGIWASDA!")
-                
-                if laporan_type == "📄 Word (.docx)":
-                    st.download_button(
-                        label="📥 Download Laporan Word",
-                        data=b"Word Document",
-                        file_name=f"LAPORAN_KOMPREHENSIF_DIGIWASDA_{datetime.now().strftime('%Y%m%d')}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
-                
-                elif laporan_type == "📊 Excel Comprehensive":
-                    st.download_button(
-                        label="📥 Download Laporan Excel",
-                        data=b"Excel Workbook",
-                        file_name=f"LAPORAN_KOMPREHENSIF_DIGIWASDA_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-                
-                elif laporan_type == "📋 PDF Report":
-                    st.download_button(
-                        label="📥 Download Laporan PDF",
-                        data=b"PDF File",
-                        file_name=f"LAPORAN_KOMPREHENSIF_DIGIWASDA_{datetime.now().strftime('%Y%m%d')}.pdf",
-                        mime="application/pdf"
-                    )
+        st.info("📝 Fitur download laporan akan ditambahkan di versi berikutnya. Untuk sekarang, gunakan data dari tab-tab sebelumnya.")
     else:
         st.warning("⚠️ Silakan upload file terlebih dahulu")
 
@@ -376,4 +321,3 @@ st.markdown("""
     <p>Versi 1.0 | Powered by Streamlit</p>
 </div>
 """, unsafe_allow_html=True)
-
