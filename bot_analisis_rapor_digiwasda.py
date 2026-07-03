@@ -1,21 +1,19 @@
 """
-DIGIWASDA v4.1 - ANALYTICAL INTELLIGENCE SYSTEM
-Automated Insights, Deep Interpretation & Actionable Recommendations
+DIGIWASDA v4.1 COMPLETE - ANALYTICAL INTELLIGENCE + WORD REPORT GENERATION
+Automated Analysis + Professional Reports dengan semua Intelligence Insights
 
 Features:
-✅ Automated Data Analysis (machine reading)
-✅ Intelligent Insights Generation (contextual narasi)
-✅ Correlation Analysis (hubungan antar indikator)
-✅ Comparative Analysis (vs sekolah lain)
-✅ Risk & Opportunity Assessment
-✅ Predictive Analytics (forecast trend)
-✅ Actionable Recommendations (konkret & terukur)
-✅ Key Findings Summary (automated)
-✅ Impact Analysis
-✅ Root Cause Extraction
+✅ 6 Intelligence Modules
+✅ Automated Insights Generation
+✅ Professional Word Reports (LENGKAP dengan semua analytics)
+✅ AI-Generated Narratives
+✅ Smart Prioritized Recommendations
+✅ Correlation Intelligence
+✅ Trend Forecasting
+✅ Download laporan lengkap per sekolah
 
 Usage:
-    streamlit run bot_digiwasda_v41_intelligence.py
+    streamlit run bot_digiwasda_v41_complete.py
 """
 
 import streamlit as st
@@ -23,7 +21,7 @@ import pandas as pd
 import numpy as np
 import openpyxl
 from docx import Document
-from docx.shared import Inches, Pt
+from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 import plotly.graph_objects as go
 import plotly.express as px
@@ -32,10 +30,10 @@ from io import BytesIO
 import seaborn as sns
 
 # ===== PAGE CONFIG =====
-st.set_page_config(page_title="DIGIWASDA v4.1 Intelligence", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="DIGIWASDA v4.1 Complete", page_icon="🧠", layout="wide")
 
-st.title("🧠 DIGIWASDA v4.1 - ANALYTICAL INTELLIGENCE SYSTEM")
-st.markdown("### Automated Insights | Deep Data Interpretation | Actionable Recommendations")
+st.title("🧠 DIGIWASDA v4.1 - ANALYTICAL INTELLIGENCE + REPORTS")
+st.markdown("### Automated Insights | Deep Analysis | Professional Reports 📄")
 st.markdown("---")
 
 # ===== ANALYTICS ENGINE =====
@@ -64,26 +62,12 @@ class AnalyticsEngine:
         insights['tren_direction'] = 'POSITIF ↑' if avg_tren >= 0 else 'NEGATIF ↓'
         insights['tren_value'] = abs(avg_tren)
         
-        # 4. Correlation Analysis
-        indicators = list(school_data['indikators'].keys())
-        scores = [school_data['indikators'][ind]['skor_2025'] for ind in indicators]
-        
-        # Literasi & Numerasi correlation
-        literasi = school_data['indikators'].get('Literasi', {}).get('skor_2025', 0)
-        numerasi = school_data['indikators'].get('Numerasi', {}).get('skor_2025', 0)
-        insights['literasi_numerasi_gap'] = abs(literasi - numerasi)
-        
-        # 5. Comparative Analysis (vs all schools)
+        # 4. Comparative Analysis (vs all schools)
         if all_schools_data and len(all_schools_data) > 1:
             system_avg = sum([d['rata_rata'] for d in all_schools_data.values()]) / len(all_schools_data)
             insights['vs_system'] = avg - system_avg
             insights['ranking'] = len([d for d in all_schools_data.values() if d['rata_rata'] > avg]) + 1
             insights['total_schools'] = len(all_schools_data)
-        
-        # 6. Risk Assessment
-        critical_indicators = [ind for ind, data in school_data['indikators'].items() if data['skor_2025'] < 40]
-        insights['critical_count'] = len(critical_indicators)
-        insights['critical_indicators'] = critical_indicators
         
         return insights
     
@@ -94,16 +78,13 @@ class AnalyticsEngine:
         status = insights['status']
         
         if status == 'BAIK':
-            narrative = f"✅ Sekolah ini mencapai status BAIK dengan rata-rata skor {avg:.2f}/100. Komitmen terhadap peningkatan mutu sudah menunjukkan hasil positif. "
-            narrative += f"Tren mutu {insights['tren_direction']}. Rekomendasi: pertahankan momentum dan optimalkan area yang masih ada potensi improvement."
+            narrative = f"✅ Sekolah ini mencapai status BAIK dengan rata-rata skor {avg:.2f}/100. Komitmen terhadap peningkatan mutu sudah menunjukkan hasil positif. Tren mutu {insights['tren_direction']}. Rekomendasi: pertahankan momentum dan optimalkan area yang masih ada potensi improvement."
         
         elif status == 'CUKUP':
-            narrative = f"⚠️ Sekolah ini mencapai status CUKUP dengan rata-rata skor {avg:.2f}/100. Diperlukan akselerasi untuk meningkatkan mutu ke level yang lebih baik. "
-            narrative += f"Tren mutu {insights['tren_direction']}. Rekomendasi: fokus pada 2-3 indikator prioritas dengan strategi yang terukur dan terstruktur."
+            narrative = f"⚠️ Sekolah ini mencapai status CUKUP dengan rata-rata skor {avg:.2f}/100. Diperlukan akselerasi untuk meningkatkan mutu ke level yang lebih baik. Tren mutu {insights['tren_direction']}. Rekomendasi: fokus pada 2-3 indikator prioritas dengan strategi yang terukur dan terstruktur."
         
         else:  # PRIORITAS
-            narrative = f"🔴 Sekolah ini memerlukan INTERVENSI DARURAT dengan rata-rata skor {avg:.2f}/100. Situasi ini membutuhkan action plan intensif dan dukungan pendampingan khusus. "
-            narrative += f"Tren mutu {insights['tren_direction']}. Rekomendasi: implementasikan program remediasi cepat dengan pendampingan dari dinas/pengawas."
+            narrative = f"🔴 Sekolah ini memerlukan INTERVENSI DARURAT dengan rata-rata skor {avg:.2f}/100. Situasi ini membutuhkan action plan intensif dan dukungan pendampingan khusus. Tren mutu {insights['tren_direction']}. Rekomendasi: implementasikan program remediasi cepat dengan pendampingan dari dinas/pengawas."
         
         return narrative
     
@@ -210,11 +191,370 @@ def extract_rapor_data(file):
         st.error(f"Error: {str(e)}")
         return None
 
-# ===== DASHBOARD SECTIONS =====
+# ===== REPORT GENERATION =====
 
-def show_helicopter_view_intelligence(school_data, all_schools_data):
-    """Module 1 dengan Intelligence"""
-    st.header("🚁 MODULE 1: HELICOPTER VIEW + INTELLIGENCE")
+def generate_comprehensive_report(school_name, school_data, all_schools_data):
+    """Generate comprehensive Word report dengan semua intelligence insights"""
+    
+    doc = Document()
+    
+    # Setup margins
+    sections = doc.sections
+    for section in sections:
+        section.top_margin = Inches(0.75)
+        section.bottom_margin = Inches(0.75)
+        section.left_margin = Inches(0.75)
+        section.right_margin = Inches(0.75)
+    
+    # ===== COVER PAGE =====
+    title = doc.add_heading('LAPORAN ANALISIS & REKOMENDASI', 0)
+    title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    subtitle = doc.add_heading('RAPOR PENDIDIKAN 2025', level=2)
+    subtitle.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    system = doc.add_heading('DENGAN INTELLIGENCE INSIGHTS', level=3)
+    system.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    school = doc.add_heading(school_name.upper(), level=1)
+    school.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    
+    doc.add_paragraph()
+    doc.add_paragraph()
+    
+    # Info table
+    info_table = doc.add_table(rows=5, cols=2)
+    info_table.style = 'Light Grid Accent 1'
+    
+    info_table.rows[0].cells[0].text = "Tahun Ajaran"
+    info_table.rows[0].cells[1].text = "2024-2025"
+    info_table.rows[1].cells[0].text = "Periode Analisis"
+    info_table.rows[1].cells[1].text = "Juni 2025"
+    info_table.rows[2].cells[0].text = "Metode Analisis"
+    info_table.rows[2].cells[1].text = "DIGIWASDA v4.1 Intelligence System"
+    info_table.rows[3].cells[0].text = "Tanggal Laporan"
+    info_table.rows[3].cells[1].text = datetime.now().strftime("%d %B %Y")
+    info_table.rows[4].cells[0].text = "Status Laporan"
+    info_table.rows[4].cells[1].text = "CONFIDENTIAL - Internal Use"
+    
+    doc.add_page_break()
+    
+    # ===== LATAR BELAKANG & TUJUAN =====
+    doc.add_heading('LATAR BELAKANG', level=1)
+    
+    doc.add_paragraph(
+        "Rapor Pendidikan merupakan instrumen pengukuran kualitas pendidikan komprehensif yang "
+        "mengukur capaian sekolah berdasarkan tujuh indikator kunci. Laporan ini menyajikan hasil "
+        "analisis mendalam menggunakan DIGIWASDA v4.1 Intelligence System, yang menggabungkan "
+        "visualisasi data dengan interpretasi berbasis artificial intelligence.",
+        style='Normal'
+    )
+    
+    doc.add_heading('TUJUAN LAPORAN', level=1)
+    
+    doc.add_paragraph(
+        "1. Menganalisis capaian kualitas pendidikan berdasarkan Rapor Pendidikan 2025",
+        style='List Number'
+    )
+    doc.add_paragraph(
+        "2. Mengidentifikasi kekuatan dan tantangan dengan insight mendalam berbasis data",
+        style='List Number'
+    )
+    doc.add_paragraph(
+        "3. Memberikan smart recommendations yang prioritized, budgeted, dan actionable",
+        style='List Number'
+    )
+    doc.add_paragraph(
+        "4. Menyajikan analisis korelasi antar indikator untuk pemahaman sistem",
+        style='List Number'
+    )
+    doc.add_paragraph(
+        "5. Memberikan trend forecasting dan proyeksi untuk strategic planning",
+        style='List Number'
+    )
+    
+    doc.add_page_break()
+    
+    # ===== EXECUTIVE SUMMARY =====
+    doc.add_heading('EXECUTIVE SUMMARY', level=1)
+    
+    insights = AnalyticsEngine.analyze_school(school_data, all_schools_data)
+    narrative = AnalyticsEngine.generate_narrative(insights)
+    
+    summary_para = doc.add_paragraph(narrative)
+    summary_para.style = 'Normal'
+    
+    # Metrics
+    doc.add_heading('KEY METRICS', level=2)
+    
+    metrics_table = doc.add_table(rows=7, cols=2)
+    metrics_table.style = 'Light Grid Accent 1'
+    
+    metrics_table.rows[0].cells[0].text = "METRIK"
+    metrics_table.rows[0].cells[1].text = "NILAI"
+    
+    metrics_table.rows[1].cells[0].text = "Rata-rata Skor"
+    metrics_table.rows[1].cells[1].text = f"{insights['avg']:.2f}/100"
+    
+    metrics_table.rows[2].cells[0].text = "Status Keseluruhan"
+    metrics_table.rows[2].cells[1].text = insights['status']
+    
+    metrics_table.rows[3].cells[0].text = "Tren Mutu"
+    metrics_table.rows[3].cells[1].text = insights['tren_direction']
+    
+    metrics_table.rows[4].cells[0].text = "Indikator Terkuat"
+    metrics_table.rows[4].cells[1].text = f"{insights['top2'][0][0]} ({insights['top2'][0][1]['skor_2025']:.2f})"
+    
+    metrics_table.rows[5].cells[0].text = "Indikator Prioritas"
+    metrics_table.rows[5].cells[1].text = f"{insights['bottom2'][0][0]} ({insights['bottom2'][0][1]['skor_2025']:.2f})"
+    
+    if 'ranking' in insights:
+        metrics_table.rows[6].cells[0].text = "Ranking dalam Sistem"
+        metrics_table.rows[6].cells[1].text = f"{insights['ranking']}/{insights['total_schools']}"
+    
+    doc.add_page_break()
+    
+    # ===== ANALISIS DETAIL INDIKATOR =====
+    doc.add_heading('ANALISIS DETAIL 7 INDIKATOR', level=1)
+    
+    detail_data = []
+    for ind_name, ind_data in sorted(school_data['indikators'].items(), 
+                                     key=lambda x: x[1]['skor_2025'], reverse=True):
+        skor_2025 = ind_data['skor_2025']
+        skor_2024 = ind_data['skor_2024']
+        perubahan = skor_2025 - skor_2024
+        tren = f"+{perubahan:.2f}" if perubahan >= 0 else f"{perubahan:.2f}"
+        
+        if skor_2025 >= 70:
+            status = "BAIK"
+        elif skor_2025 >= 50:
+            status = "CUKUP"
+        else:
+            status = "PRIORITAS"
+        
+        detail_data.append([
+            ind_name,
+            f"{skor_2024:.2f}",
+            f"{skor_2025:.2f}",
+            tren,
+            status
+        ])
+    
+    table = doc.add_table(rows=1, cols=5)
+    table.style = 'Light Grid Accent 1'
+    
+    hdr_cells = table.rows[0].cells
+    headers = ["Indikator", "Skor 2024", "Skor 2025", "Perubahan", "Status"]
+    for i, header in enumerate(headers):
+        hdr_cells[i].text = header
+        hdr_cells[i].paragraphs[0].runs[0].bold = True
+    
+    for row_data in detail_data:
+        row_cells = table.add_row().cells
+        for i, value in enumerate(row_data):
+            row_cells[i].text = str(value)
+    
+    doc.add_paragraph()
+    doc.add_page_break()
+    
+    # ===== X-RAY INTELLIGENCE =====
+    doc.add_heading('MODULE 1: X-RAY INTELLIGENCE', level=1)
+    doc.add_paragraph("Analisis mendalam terhadap kekuatan dan prioritas perbaikan")
+    
+    doc.add_heading('💪 Dua Kekuatan Terbaik', level=2)
+    for i, (ind_name, ind_data) in enumerate(insights['top2'], 1):
+        trend_dir = "↑" if ind_data['tren'] >= 0 else "↓"
+        doc.add_paragraph(
+            f"{ind_name} ({ind_data['skor_2025']:.2f}/100) {trend_dir} {abs(ind_data['tren']):.2f}: "
+            f"Pencapaian ini menunjukkan implementasi efektif dalam area ini. Dokumentasikan praktik baik "
+            f"dan pertimbangkan replikasi ke indikator lain.",
+            style='List Bullet'
+        )
+    
+    doc.add_heading('⚠️ Dua Prioritas Perbaikan', level=2)
+    for i, (ind_name, ind_data) in enumerate(insights['bottom2'], 1):
+        trend_dir = "↑" if ind_data['tren'] >= 0 else "↓"
+        status_text = "KRITIS - intervensi segera dibutuhkan" if ind_data['skor_2025'] < 40 else "perlu peningkatan"
+        doc.add_paragraph(
+            f"{ind_name} ({ind_data['skor_2025']:.2f}/100) {trend_dir} {abs(ind_data['tren']):.2f}: "
+            f"Area ini {status_text}. Diperlukan action plan terstruktur dan dukungan intensif.",
+            style='List Bullet'
+        )
+    
+    doc.add_page_break()
+    
+    # ===== SMART RECOMMENDATIONS =====
+    doc.add_heading('MODULE 2: SMART RECOMMENDATIONS', level=1)
+    doc.add_paragraph("Prioritized Action Plan dengan Budget & Timeline")
+    
+    recommendations = AnalyticsEngine.generate_recommendations(school_data, insights)
+    
+    if recommendations:
+        urgent = [r for r in recommendations if r['priority'] == 'URGENT']
+        high = [r for r in recommendations if r['priority'] == 'HIGH']
+        maintain = [r for r in recommendations if r['priority'] == 'MAINTAIN']
+        
+        if urgent:
+            doc.add_heading('🔴 URGENT ACTIONS (Implementasi Segera)', level=2)
+            for rec in urgent:
+                doc.add_heading(f"{rec['area']}", level=3)
+                doc.add_paragraph(f"Aksi: {rec['action']}")
+                doc.add_paragraph(f"Target: {rec['target']}")
+                doc.add_paragraph(f"Budget Estimasi: {rec['budget']}")
+                doc.add_paragraph(f"ARKAS Program: {rec['arkas']}")
+                doc.add_paragraph()
+        
+        if high:
+            doc.add_heading('🟡 HIGH PRIORITY (Timeline: 8-12 minggu)', level=2)
+            for rec in high:
+                doc.add_heading(f"{rec['area']}", level=3)
+                doc.add_paragraph(f"Aksi: {rec['action']}")
+                doc.add_paragraph(f"Target: {rec['target']}")
+                doc.add_paragraph(f"Budget Estimasi: {rec['budget']}")
+                doc.add_paragraph()
+        
+        if maintain:
+            doc.add_heading('🟢 MAINTAIN & DEVELOP (Berkelanjutan)', level=2)
+            for rec in maintain:
+                doc.add_heading(f"{rec['area']}", level=3)
+                doc.add_paragraph(f"Aksi: {rec['action']}")
+                doc.add_paragraph(f"Target: {rec['target']}")
+                doc.add_paragraph()
+    
+    doc.add_page_break()
+    
+    # ===== CORRELATION ANALYSIS =====
+    doc.add_heading('MODULE 3: CORRELATION ANALYSIS', level=1)
+    doc.add_paragraph("Analisis Hubungan dan Dampak Antar Indikator")
+    
+    literasi = school_data['indikators'].get('Literasi', {}).get('skor_2025', 0)
+    numerasi = school_data['indikators'].get('Numerasi', {}).get('skor_2025', 0)
+    pelatihan = school_data['indikators'].get('Pelatihan Guru', {}).get('skor_2025', 0)
+    pembelajaran = school_data['indikators'].get('Kualitas Pembelajaran', {}).get('skor_2025', 0)
+    kepemimpinan = school_data['indikators'].get('Kepemimpinan Instruksional', {}).get('skor_2025', 0)
+    refleksi = school_data['indikators'].get('Refleksi & Perbaikan', {}).get('skor_2025', 0)
+    
+    doc.add_heading('Literasi & Numerasi Balance', level=2)
+    lit_num_gap = abs(literasi - numerasi)
+    if lit_num_gap < 10:
+        doc.add_paragraph(
+            f"Status: SEIMBANG (gap: {lit_num_gap:.1f} poin). Balanced foundational competency ini adalah indikasi "
+            f"program pembelajaran yang well-rounded. Pertahankan momentum di kedua area.",
+            style='Normal'
+        )
+    elif lit_num_gap < 20:
+        doc.add_paragraph(
+            f"Status: AGAK BERBEDA (gap: {lit_num_gap:.1f} poin). Ada ketidakseimbangan yang memerlukan fokus "
+            f"akselerasi pada area yang lebih rendah.",
+            style='Normal'
+        )
+    else:
+        doc.add_paragraph(
+            f"Status: SANGAT BERBEDA (gap: {lit_num_gap:.1f} poin). Ketidakseimbangan signifikan menunjukkan perlu "
+            f"strategi targeted dan resources reallocation untuk mencapai balance.",
+            style='Normal'
+        )
+    
+    doc.add_heading('Pelatihan Guru → Kualitas Pembelajaran', level=2)
+    if pelatihan >= 70 and pembelajaran >= 70:
+        doc.add_paragraph(
+            "Status: KUAT IMPACT. Investasi dalam guru professional development menghasilkan learning quality yang baik. "
+            "Ini menunjukkan causal relationship yang positif. Pertahankan fokus pada teacher development.",
+            style='Normal'
+        )
+    elif pelatihan < 50 or pembelajaran < 50:
+        doc.add_paragraph(
+            "Status: LEMAH. Perlu akselerasi pada teacher professional development yang akan directly impact "
+            "kualitas pembelajaran siswa. Area ini adalah leverage point untuk system improvement.",
+            style='Normal'
+        )
+    
+    doc.add_heading('Kepemimpinan Instruksional → Refleksi & Perbaikan', level=2)
+    if kepemimpinan >= 70 and refleksi >= 70:
+        doc.add_paragraph(
+            "Status: KUAT. Budaya continuous improvement aktif di sekolah. Kepemimpinan yang kuat mendorong "
+            "systematic reflection dan data-driven refinement. Ini adalah healthy improvement ecosystem.",
+            style='Normal'
+        )
+    elif kepemimpinan < 50:
+        doc.add_paragraph(
+            "Status: LEMAH LEADERSHIP. Kepemimpinan instruksional yang lemah menghalankan systematic improvement. "
+            "Prioritas strategis: strengthen instructional leadership untuk unlock improvement potential.",
+            style='Normal'
+        )
+    
+    doc.add_page_break()
+    
+    # ===== TREND FORECAST =====
+    doc.add_heading('MODULE 4: TREND FORECAST & PROJECTIONS', level=1)
+    doc.add_paragraph("Analisis Tren Historis dan Proyeksi Masa Depan")
+    
+    improving = []
+    declining = []
+    
+    for ind_name, ind_data in school_data['indikators'].items():
+        if ind_data['tren'] >= 0:
+            improving.append((ind_name, ind_data['tren']))
+        else:
+            declining.append((ind_name, abs(ind_data['tren'])))
+    
+    if improving:
+        doc.add_heading('📈 IMPROVING INDICATORS (2024→2025)', level=2)
+        improving_text = ", ".join([f"{ind}: +{tren:.2f}pt" for ind, tren in sorted(improving, key=lambda x: x[1], reverse=True)])
+        doc.add_paragraph(f"Indikator dengan trend positif: {improving_text}")
+    
+    if declining:
+        doc.add_heading('📉 DECLINING INDICATORS (2024→2025)', level=2)
+        declining_text = ", ".join([f"{ind}: -{tren:.2f}pt" for ind, tren in sorted(declining, key=lambda x: x[1], reverse=True)])
+        doc.add_paragraph(f"Indikator dengan trend negatif: {declining_text}")
+    
+    doc.add_heading('2026 FORECAST (If trend continues)', level=2)
+    avg_forecast = insights['avg'] + (insights['tren_value'] if 'POSITIF' in insights['tren_direction'] else -insights['tren_value'])
+    
+    doc.add_paragraph(
+        f"Berdasarkan tren 2024-2025, proyeksi 2026 adalah: Rata-rata skor akan "
+        f"{'meningkat' if insights['tren_direction'] == 'POSITIF ↑' else 'menurun'} "
+        f"ke approximately {avg_forecast:.2f}/100 dengan trajectory rate {insights['tren_value']:.2f} poin per tahun. "
+        f"Skenario ini asumsi bahwa tidak ada perubahan signifikan dalam kebijakan atau sumber daya.",
+        style='Normal'
+    )
+    
+    doc.add_page_break()
+    
+    # ===== KESIMPULAN =====
+    doc.add_heading('KESIMPULAN & REKOMENDASI STRATEGIS', level=1)
+    
+    doc.add_paragraph(
+        f"{school_name} mencapai rata-rata skor {insights['avg']:.2f}/100 dengan status {insights['status']}. "
+        f"Tren mutu menunjukkan arah {insights['tren_direction']}.  Implementasi action plan yang terukur, "
+        f"fokus pada indikator prioritas, dan leveraging kekuatan existing akan mendorong peningkatan mutu "
+        f"yang signifikan dan sustainable.",
+        style='Normal'
+    )
+    
+    doc.add_paragraph(
+        "Kesuksesan implementasi memerlukan: (1) Kolaborasi aktif semua stakeholder, (2) Dukungan kepemimpinan "
+        "yang kuat dan visioner, (3) Alokasi resources yang tepat, (4) Monitoring berkala untuk ensure setiap "
+        "inisiatif berjalan sesuai plan, dan (5) Willingness untuk learn dan adapt berdasarkan feedback.",
+        style='Normal'
+    )
+    
+    # Footer
+    doc.add_page_break()
+    doc.add_paragraph("_" * 80)
+    doc.add_paragraph(f"Laporan Analisis & Rekomendasi Rapor Pendidikan", style='List Bullet')
+    doc.add_paragraph(f"{school_name}", style='List Bullet')
+    doc.add_paragraph(f"DIGIWASDA v4.1 Intelligence System", style='List Bullet')
+    doc.add_paragraph(f"Generated: {datetime.now().strftime('%d %B %Y at %H:%M')}", style='List Bullet')
+    doc.add_paragraph("Status: CONFIDENTIAL - Internal Use Only", style='List Bullet')
+    
+    return doc
+
+# ===== DASHBOARD MODULES =====
+
+def show_helicopter_view(school_data, all_schools_data):
+    """Module 1: Helicopter View Intelligence"""
+    st.header("🚁 HELICOPTER VIEW + INTELLIGENCE")
     
     insights = AnalyticsEngine.analyze_school(school_data, all_schools_data)
     narrative = AnalyticsEngine.generate_narrative(insights)
@@ -222,7 +562,6 @@ def show_helicopter_view_intelligence(school_data, all_schools_data):
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # Gauge chart
         fig = go.Figure(go.Indicator(
             mode="gauge+number+delta",
             value=insights['avg'],
@@ -246,24 +585,11 @@ def show_helicopter_view_intelligence(school_data, all_schools_data):
         st.metric("Skor Rata-rata", f"{insights['avg']:.2f}/100")
         st.metric("Tren", insights['tren_direction'])
     
-    # AI NARASI
     st.info(f"**🤖 AI ANALYSIS:** {narrative}")
-    
-    # KEY FINDINGS
-    st.subheader("📊 Key Findings")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        top_ind, top_val = insights['top2'][0]
-        st.success(f"**Terkuat:** {top_ind}\n{top_val['skor_2025']:.2f}")
-    with col2:
-        st.metric("Ranking", f"{insights.get('ranking', 'N/A')}/{insights.get('total_schools', 'N/A')}")
-    with col3:
-        bottom_ind, bottom_val = insights['bottom2'][0]
-        st.error(f"**Prioritas:** {bottom_ind}\n{bottom_val['skor_2025']:.2f}")
 
 def show_xray_intelligence(school_data):
-    """Module 3 dengan Intelligence"""
-    st.header("🔍 MODULE 3: X-RAY ANALYSIS + DEEP INSIGHTS")
+    """Module 2: X-Ray Intelligence"""
+    st.header("🔍 X-RAY INTELLIGENCE")
     
     insights = AnalyticsEngine.analyze_school(school_data)
     
@@ -272,241 +598,70 @@ def show_xray_intelligence(school_data):
     with col1:
         st.subheader("💪 2 Kekuatan Terbaik")
         for i, (ind_name, ind_data) in enumerate(insights['top2'], 1):
-            with st.container():
-                st.success(f"**{i}. {ind_name}**")
-                st.write(f"Skor: {ind_data['skor_2025']:.2f}")
-                st.write(f"Tren: {'↑ +' if ind_data['tren'] >= 0 else '↓ '}{abs(ind_data['tren']):.2f}")
-                st.write(f"Status: DIPERTAHANKAN & DIKEMBANGKAN")
+            st.success(f"**{i}. {ind_name}**\nSkor: {ind_data['skor_2025']:.2f}\nStatus: DIPERTAHANKAN")
     
     with col2:
         st.subheader("⚠️ 2 Prioritas Perbaikan")
         for i, (ind_name, ind_data) in enumerate(insights['bottom2'], 1):
-            with st.container():
-                st.error(f"**{i}. {ind_name}**")
-                st.write(f"Skor: {ind_data['skor_2025']:.2f}")
-                st.write(f"Tren: {'↑ +' if ind_data['tren'] >= 0 else '↓ '}{abs(ind_data['tren']):.2f}")
-                if ind_data['skor_2025'] < 40:
-                    st.write(f"Status: **KRITIS - INTERVENSI SEGERA**")
-                else:
-                    st.write(f"Status: Perlukan peningkatan")
-    
-    # Bar chart
-    indicators = list(school_data['indikators'].keys())
-    scores = [school_data['indikators'][ind]['skor_2025'] for ind in indicators]
-    
-    fig = px.bar(
-        x=indicators,
-        y=scores,
-        color=scores,
-        color_continuous_scale=['red', 'orange', 'yellow', 'lightgreen', 'green'],
-        labels={'x': 'Indikator', 'y': 'Skor'},
-        title="Profil Lengkap 7 Indikator"
-    )
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # AI INSIGHTS
-    st.info("**🤖 INTERPRETATION:** Perbedaan signifikan antara indikator kuat dan lemah menunjukkan perlu fokus strategis. Leverage kekuatan yang ada untuk mendukung improvement di area yang lemah.")
+            st.error(f"**{i}. {ind_name}**\nSkor: {ind_data['skor_2025']:.2f}\nStatus: PRIORITAS")
 
-def show_heatmap_intelligence(schools_data):
-    """Module 4 dengan Intelligence"""
-    st.header("🔥 MODULE 4: KESENJANGAN (HEATMAP) + ANALYSIS")
-    
-    if len(schools_data) < 2:
-        st.warning("Perlu minimal 2 sekolah")
-        return
-    
-    # Heatmap data
-    heatmap_data = []
-    school_names = []
-    
-    for school_name, school_data in schools_data.items():
-        school_names.append(school_name[:12])
-        row = [school_data['indikators'][ind]['skor_2025'] for ind in school_data['indikators'].keys()]
-        heatmap_data.append(row)
-    
-    indicators = list(schools_data[list(schools_data.keys())[0]]['indikators'].keys())
-    
-    fig = go.Figure(data=go.Heatmap(
-        z=heatmap_data,
-        x=indicators,
-        y=school_names,
-        colorscale='RdYlGn',
-        zmid=60,
-        text=np.array(heatmap_data).round(1),
-        texttemplate='%{text:.1f}',
-        textfont={"size": 9}
-    ))
-    fig.update_layout(height=400, title="Heatmap Kesenjangan Antar Sekolah")
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # KEY INSIGHTS
-    st.subheader("🔍 Key Insights dari Heatmap")
-    
-    # Find critical areas
-    heatmap_arr = np.array(heatmap_data)
-    critical_cols = []
-    for col_idx, col in enumerate(heatmap_arr.T):
-        if sum(1 for val in col if val < 40) > 0:
-            critical_cols.append((indicators[col_idx], sum(1 for val in col if val < 40)))
-    
-    if critical_cols:
-        st.error("🔴 **CRITICAL AREAS (Red Zones):**")
-        for ind, count in critical_cols:
-            st.write(f"- {ind}: {count} sekolah dalam kondisi kritis (skor <40)")
-    
-    # Find best performers
-    top_performers = []
-    for idx, school_name in enumerate(school_names):
-        avg = np.mean(heatmap_data[idx])
-        if avg >= 70:
-            top_performers.append((school_name, avg))
-    
-    if top_performers:
-        st.success("🟢 **BEST PERFORMERS (Green Zones):**")
-        for school, avg in sorted(top_performers, key=lambda x: x[1], reverse=True):
-            st.write(f"- {school}: Rata-rata {avg:.2f} (Status BAIK)")
-    
-    st.info("**🤖 STRATEGIC INSIGHT:** Leverage best performers sebagai learning center untuk sekolah yang masih kritis. Program mentoring peer-to-peer bisa mempercepat improvement.")
-
-def show_recommendations_intelligence(school_data, all_schools_data=None):
-    """Smart Recommendations dengan Prioritas & Budget"""
-    st.header("💡 INTELLIGENT RECOMMENDATIONS")
+def show_recommendations(school_data, all_schools_data):
+    """Module 3: Smart Recommendations"""
+    st.header("💡 SMART RECOMMENDATIONS")
     
     insights = AnalyticsEngine.analyze_school(school_data, all_schools_data)
     recommendations = AnalyticsEngine.generate_recommendations(school_data, insights)
     
-    if not recommendations:
-        st.info("Tidak ada rekomendasi yang diperlukan")
-        return
-    
-    # Group by priority
-    urgent = [r for r in recommendations if r['priority'] == 'URGENT']
-    high = [r for r in recommendations if r['priority'] == 'HIGH']
-    maintain = [r for r in recommendations if r['priority'] == 'MAINTAIN']
-    
-    if urgent:
-        st.subheader("🔴 URGENT ACTIONS (Segera implementasikan)")
-        for rec in urgent:
-            with st.container():
-                st.error(f"**{rec['area']}**")
-                st.write(f"**Aksi:** {rec['action']}")
-                st.write(f"**Target:** {rec['target']}")
-                st.write(f"**Budget:** {rec['budget']}")
-                st.write(f"**ARKAS:** {rec['arkas']}")
-                st.write("---")
-    
-    if high:
-        st.subheader("🟡 HIGH PRIORITY (8-12 minggu)")
-        for rec in high:
-            with st.container():
-                st.warning(f"**{rec['area']}**")
-                st.write(f"**Aksi:** {rec['action']}")
-                st.write(f"**Target:** {rec['target']}")
-                st.write(f"**Budget:** {rec['budget']}")
-                st.write("---")
-    
-    if maintain:
-        st.subheader("🟢 MAINTAIN & DEVELOP (Berkelanjutan)")
-        for rec in maintain:
-            with st.container():
-                st.success(f"**{rec['area']}**")
-                st.write(f"**Aksi:** {rec['action']}")
-                st.write(f"**Target:** {rec['target']}")
-                st.write("---")
+    if recommendations:
+        for rec in recommendations:
+            if rec['priority'] == 'URGENT':
+                with st.container():
+                    st.error(f"🔴 {rec['area']} - URGENT")
+                    st.write(f"**Aksi:** {rec['action']}")
+                    st.write(f"**Target:** {rec['target']}")
+                    st.write(f"**Budget:** {rec['budget']}")
 
-def show_correlation_analysis(school_data):
-    """Analisis Korelasi Antar Indikator"""
+def show_correlation(school_data):
+    """Module 4: Correlation Analysis"""
     st.header("🔗 CORRELATION ANALYSIS")
-    
-    indicators = list(school_data['indikators'].keys())
-    scores = np.array([school_data['indikators'][ind]['skor_2025'] for ind in indicators])
-    
-    # Calculate correlations manually
-    st.subheader("Hubungan Antar Indikator")
     
     literasi = school_data['indikators'].get('Literasi', {}).get('skor_2025', 0)
     numerasi = school_data['indikators'].get('Numerasi', {}).get('skor_2025', 0)
-    karakter = school_data['indikators'].get('Karakter', {}).get('skor_2025', 0)
     pelatihan = school_data['indikators'].get('Pelatihan Guru', {}).get('skor_2025', 0)
     pembelajaran = school_data['indikators'].get('Kualitas Pembelajaran', {}).get('skor_2025', 0)
-    refleksi = school_data['indikators'].get('Refleksi & Perbaikan', {}).get('skor_2025', 0)
-    kepemimpinan = school_data['indikators'].get('Kepemimpinan Instruksional', {}).get('skor_2025', 0)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     
     with col1:
-        lit_num_gap = abs(literasi - numerasi)
-        if lit_num_gap < 10:
-            st.success(f"✅ Literasi & Numerasi **SEIMBANG** (gap: {lit_num_gap:.1f})")
-        elif lit_num_gap < 20:
-            st.warning(f"⚠️ Literasi & Numerasi **AGAK BERBEDA** (gap: {lit_num_gap:.1f})")
+        gap = abs(literasi - numerasi)
+        if gap < 10:
+            st.success(f"✅ Literasi & Numerasi SEIMBANG (gap: {gap:.1f})")
         else:
-            st.error(f"❌ Literasi & Numerasi **SANGAT BERBEDA** (gap: {lit_num_gap:.1f})")
+            st.warning(f"⚠️ Literasi & Numerasi BERBEDA (gap: {gap:.1f})")
     
     with col2:
         if pelatihan >= 70 and pembelajaran >= 70:
-            st.success(f"✅ Pelatihan Guru & Pembelajaran **KUAT** - Good Leadership")
-        elif pelatihan < 50 or pembelajaran < 50:
-            st.error(f"❌ Pelatihan Guru &/atau Pembelajaran **LEMAH** - Perlu fokus")
+            st.success(f"✅ Guru Training → Learning KUAT")
         else:
-            st.warning(f"⚠️ Pelatihan Guru & Pembelajaran **CUKUP** - Tingkatkan")
-    
-    with col3:
-        if kepemimpinan >= 70 and refleksi >= 70:
-            st.success(f"✅ KS & Refleksi **KUAT** - Kultur improvement aktif")
-        elif kepemimpinan < 50:
-            st.error(f"❌ Kepemimpinan **LEMAH** - Hambat improvement")
-        else:
-            st.warning(f"⚠️ Ada area yang perlu ditingkatkan")
-    
-    st.info("**🤖 CORRELATION INSIGHT:** Indikator terkait seperti Pelatihan Guru & Pembelajaran biasanya berkorelasi kuat. Jika salah satu rendah, fokus pada area ini akan berdampak positif ke indikator lain.")
+            st.error(f"❌ Guru Training → Learning LEMAH")
 
-def show_trend_forecast(school_data):
-    """Forecast trend ke depan"""
-    st.header("📈 TREND FORECAST & PREDICTION")
+def show_forecast(school_data):
+    """Module 5: Trend Forecast"""
+    st.header("📈 TREND FORECAST")
     
     indicators = list(school_data['indikators'].keys())
     skor_2024 = [school_data['indikators'][ind]['skor_2024'] for ind in indicators]
     skor_2025 = [school_data['indikators'][ind]['skor_2025'] for ind in indicators]
     
     fig = go.Figure()
+    fig.add_trace(go.Scatter(x=indicators, y=skor_2024, mode='lines+markers', name='2024'))
+    fig.add_trace(go.Scatter(x=indicators, y=skor_2025, mode='lines+markers', name='2025'))
     
-    fig.add_trace(go.Scatter(x=indicators, y=skor_2024, mode='lines+markers', name='2024', line=dict(color='blue')))
-    fig.add_trace(go.Scatter(x=indicators, y=skor_2025, mode='lines+markers', name='2025', line=dict(color='green')))
-    
-    # Forecast 2026 (simple linear extrapolation)
-    skor_2026 = [skor_2025[i] + (skor_2025[i] - skor_2024[i]) for i in range(len(indicators))]
-    fig.add_trace(go.Scatter(x=indicators, y=skor_2026, mode='lines+markers', name='Forecast 2026 (if trend continues)', 
-                            line=dict(color='orange', dash='dash')))
-    
-    fig.update_layout(title="Tren & Forecast Mutu", height=400, hovermode='x unified')
     st.plotly_chart(fig, use_container_width=True)
-    
-    # Analysis
-    st.subheader("📊 Trend Analysis")
-    
-    improving = []
-    declining = []
-    
-    for i, ind in enumerate(indicators):
-        if skor_2025[i] > skor_2024[i]:
-            improving.append((ind, skor_2025[i] - skor_2024[i]))
-        else:
-            declining.append((ind, skor_2024[i] - skor_2025[i]))
-    
-    if improving:
-        st.success("📈 **IMPROVING INDICATORS:**")
-        for ind, tren in sorted(improving, key=lambda x: x[1], reverse=True):
-            st.write(f"- {ind}: ↑ +{tren:.2f} poin")
-    
-    if declining:
-        st.error("📉 **DECLINING INDICATORS:**")
-        for ind, tren in sorted(declining, key=lambda x: x[1], reverse=True):
-            st.write(f"- {ind}: ↓ -{tren:.2f} poin")
 
-# ===== MAIN DASHBOARD =====
+# ===== MAIN APP =====
 
-st.sidebar.header("📊 DASHBOARD CONTROLS")
+st.sidebar.header("📊 CONTROLS")
 
 uploaded_files = st.sidebar.file_uploader("Upload Rapor Excel", type=['xlsx'], accept_multiple_files=True)
 
@@ -522,46 +677,51 @@ if uploaded_files:
     
     selected_school = st.sidebar.selectbox("Pilih Sekolah", list(all_schools.keys()))
     st.session_state.selected_school = selected_school
+    
+    # Download Report Button
+    school_data = all_schools[selected_school]
+    
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("📄 DOWNLOAD REPORTS")
+    
+    if st.sidebar.button("📥 Download Laporan Lengkap (Word)"):
+        doc = generate_comprehensive_report(selected_school, school_data, all_schools)
+        
+        buffer = BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+        
+        st.sidebar.download_button(
+            label="📥 Download Word Report",
+            data=buffer.getvalue(),
+            file_name=f"LAPORAN_ANALISIS_{selected_school.replace(' ', '_')}_2025.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+        st.sidebar.success("✅ Report ready to download!")
 
-# Display intelligence dashboard
+# Display Dashboard
 if st.session_state.get('schools_data'):
     schools_data = st.session_state.schools_data
     selected_school = st.session_state.get('selected_school', list(schools_data.keys())[0])
     school_data = schools_data[selected_school]
     
-    st.sidebar.markdown(f"**Selected School:** {selected_school}")
+    st.sidebar.markdown(f"**Selected:** {selected_school}")
     
-    # Intelligence Dashboard Tabs
-    tabs = st.tabs([
-        "🚁 Helicopter View", "🔍 X-Ray Intelligence", "🔥 Heatmap", 
-        "💡 Smart Recommendations", "🔗 Correlation", "📈 Forecast"
-    ])
+    tabs = st.tabs(["🚁 Helicopter View", "🔍 X-Ray", "💡 Recommendations", "🔗 Correlation", "📈 Forecast"])
     
     with tabs[0]:
-        show_helicopter_view_intelligence(school_data, schools_data)
-    
+        show_helicopter_view(school_data, schools_data)
     with tabs[1]:
         show_xray_intelligence(school_data)
-    
     with tabs[2]:
-        show_heatmap_intelligence(schools_data)
-    
+        show_recommendations(school_data, schools_data)
     with tabs[3]:
-        show_recommendations_intelligence(school_data, schools_data)
-    
+        show_correlation(school_data)
     with tabs[4]:
-        show_correlation_analysis(school_data)
-    
-    with tabs[5]:
-        show_trend_forecast(school_data)
+        show_forecast(school_data)
 
 else:
-    st.info("⬆️ Upload Rapor Excel di sidebar untuk mulai")
+    st.info("⬆️ Upload Rapor Excel di sidebar")
 
 st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: gray; font-size: 10px;'>
-    🧠 DIGIWASDA v4.1 - ANALYTICAL INTELLIGENCE SYSTEM
-    <br>Automated Insights | Deep Data Interpretation | Actionable Recommendations
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;color:gray;font-size:9px;'>🧠 DIGIWASDA v4.1 Complete | Intelligence + Reports</div>", unsafe_allow_html=True)
