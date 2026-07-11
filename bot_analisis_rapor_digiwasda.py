@@ -312,6 +312,38 @@ def generate_comprehensive_report(school_name, school_data, all_schools_data):
         metrics_table.rows[6].cells[0].text = "Ranking dalam Sistem"
         metrics_table.rows[6].cells[1].text = f"{insights['ranking']}/{insights['total_schools']}"
     
+    # ===== ADD DETAILED INTERPRETATION =====
+    doc.add_paragraph()
+    doc.add_heading('INTERPRETASI TABEL KEY METRICS', level=3)
+    
+    avg = insights['avg']
+    status = insights['status']
+    
+    interp_text = f"""Tabel di atas menunjukkan ringkasan kinerja keseluruhan {school_name} dalam 7 dimensi utama Rapor Pendidikan.
+
+1. RATA-RATA SKOR ({avg:.2f}/100):
+Sekolah mencapai skor rata-rata {avg:.2f} dari 100, yang masuk dalam kategori {'BAIK (≥70)' if avg >= 70 else 'CUKUP (50-70)' if avg >= 50 else 'PRIORITAS (<50)'}. """
+    
+    if avg >= 70:
+        interp_text += "Pencapaian ini menunjukkan komitmen sekolah yang kuat terhadap peningkatan kualitas pendidikan. Rekomendasi: pertahankan momentum positif dan optimalkan area yang masih memiliki potensi pengembangan."
+    elif avg >= 50:
+        interp_text += "Sekolah sudah mencapai level yang dapat diterima, namun masih ada gap signifikan terhadap target excellence. Diperlukan akselerasi improvement yang terukur dan strategis, terutama pada indikator-indikator prioritas."
+    else:
+        interp_text += f"Situasi ini sangat memerlukan perhatian urgent. Sekolah membutuhkan intervention plan yang comprehensive dan intensive monitoring dari pengawas/dinas pendidikan untuk memperbaiki kondisi ini."
+    
+    interp_text += f"""
+
+2. STATUS KESELURUHAN ({status}):
+Status {status} menunjukkan bahwa sekolah berada dalam kondisi {'yang sangat baik, dengan level excellence' if status == 'BAIK' else 'yang acceptable namun memerlukan improvement' if status == 'CUKUP' else 'yang sangat challenging dan memerlukan intervention urgent'}. Strategi yang diperlukan adalah {'mempertahankan & mengembangkan momentum positif yang ada' if status == 'BAIK' else 'mempercepat improvement dengan fokus pada area-area prioritas' if status == 'CUKUP' else 'melakukan comprehensive remediation dengan dukungan penuh dari stakeholder dan dinas pendidikan'}.
+
+3. TREN MUTU ({insights['tren_direction']}):
+Tren mutu menunjukkan arah {'positif ↑, yang berarti ada momentum improvement dan situasi semakin membaik' if 'POSITIF' in insights['tren_direction'] else 'negatif ↓, yang merupakan warning sign bahwa situasi semakin memburuk dan immediate action sangat critical'}. Hal ini harus menjadi basis dalam menentukan strategi improvement yang akan dijalankan.
+
+IMPLIKASI STRATEGIS:
+Berdasarkan tabel di atas, {school_name} memerlukan fokus pada indikator prioritas dengan resource allocation yang jelas. Setiap indikator yang skornya rendah harus ditargetkan untuk peningkatan dengan timeline yang terukur dan terstruktur."""
+    
+    doc.add_paragraph(interp_text)
+    
     doc.add_page_break()
     
     # ===== ANALISIS DETAIL INDIKATOR =====
@@ -353,6 +385,51 @@ def generate_comprehensive_report(school_name, school_data, all_schools_data):
         row_cells = table.add_row().cells
         for i, value in enumerate(row_data):
             row_cells[i].text = str(value)
+    
+    # ===== ADD DETAILED ANALYSIS OF INDICATORS =====
+    doc.add_paragraph()
+    doc.add_heading('INTERPRETASI TABEL DETAIL 7 INDIKATOR', level=3)
+    
+    detail_analysis = "Tabel di atas menunjukkan performance masing-masing indikator dengan perbandingan 2024-2025. Analisis mendalam:\n\n"
+    
+    # Find critical indicators
+    critical_inds = [name for name, data in school_data['indikators'].items() if data['skor_2025'] < 40]
+    if critical_inds:
+        detail_analysis += "🔴 INDIKATOR KRITIS (Skor < 40 - Intervensi Segera Diperlukan):\n"
+        for ind_name in critical_inds:
+            ind_data = school_data['indikators'][ind_name]
+            detail_analysis += f"• {ind_name}: {ind_data['skor_2025']:.2f}/100 (Tren: {'+' if ind_data['tren'] >= 0 else ''}{ind_data['tren']:.2f})\n  Implikasi: Area ini sangat urgent memerlukan intervention plan yang specific dan terukur.\n"
+        detail_analysis += "\n"
+    
+    # Find improving indicators
+    improving_inds = [(name, data['tren']) for name, data in school_data['indikators'].items() if data['tren'] > 0]
+    if improving_inds:
+        detail_analysis += "📈 INDIKATOR DENGAN TREN POSITIF (Menunjukkan Improvement):\n"
+        for ind_name, tren_val in sorted(improving_inds, key=lambda x: x[1], reverse=True):
+            ind_skor = school_data['indikators'][ind_name]['skor_2025']
+            detail_analysis += f"• {ind_name}: ↑ +{tren_val:.2f} poin (Skor 2025: {ind_skor:.2f})\n  Implikasi: Momentum improvement baik, pertahankan strategi yang sedang berjalan.\n"
+        detail_analysis += "\n"
+    
+    # Find declining indicators
+    declining_inds = [(name, data['tren']) for name, data in school_data['indikators'].items() if data['tren'] < 0]
+    if declining_inds:
+        detail_analysis += "📉 INDIKATOR DENGAN TREN NEGATIF (Warning Sign):\n"
+        for ind_name, tren_val in sorted(declining_inds, key=lambda x: abs(x[1]), reverse=True):
+            ind_skor = school_data['indikators'][ind_name]['skor_2025']
+            detail_analysis += f"• {ind_name}: ↓ {tren_val:.2f} poin (Skor 2025: {ind_skor:.2f})\n  Implikasi: Menurunnya skor adalah warning sign, investigasi root cause dan lakukan corrective action.\n"
+        detail_analysis += "\n"
+    
+    detail_analysis += f"""RINGKASAN POLA:
+Dari data di atas, terlihat bahwa:
+1. Indikator-indikator yang sudah mencapai skor tinggi harus dipertahankan momentum-nya
+2. Indikator-indikator yang turun harus menjadi focus area untuk investigasi lebih lanjut
+3. Indikator-indikator kritis memerlukan urgent intervention dengan resource yang adequate
+4. Semua improvement harus didukung dengan capacity building guru dan support system yang kuat
+
+REKOMENDASI STRATEGIS:
+Prioritaskan improvement pada indikator-indikator yang skor-nya terendah dan impactnya terhadap pembelajaran siswa paling signifikan. Gunakan indikator-indikator yang sudah baik sebagai leverage untuk improvement di area lain."""
+    
+    doc.add_paragraph(detail_analysis)
     
     doc.add_paragraph()
     doc.add_page_break()
